@@ -1,3 +1,6 @@
+// This is the deployed backend URL.
+const API_URL = "https://caps-api.onrender.com";
+
 // These grab the forms and page elements from index.html.
 const authSection = document.querySelector("#auth-section");
 const registerForm = document.querySelector("#register-form");
@@ -58,7 +61,7 @@ async function loadTrees() {
   }
 
   // This sends a request to get the user's trees.
-  const response = await fetch(`/api/trees?userId=${currentUser.id}`);
+  const response = await fetch(`${API_URL}/api/trees?userId=${currentUser.id}`);
   // This turns the response into JSON.
   const data = await response.json();
   // This shows the trees on the page.
@@ -79,7 +82,7 @@ registerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   // This sends the register form values to the server.
-  const response = await fetch("/api/auth/register", {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -110,7 +113,7 @@ loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   // This sends the login form values to the server.
-  const response = await fetch("/api/auth/login", {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -140,7 +143,7 @@ treeForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   // This sends the tree form values to the server.
-  const response = await fetch("/api/trees", {
+  const response = await fetch(`${API_URL}/api/trees`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

@@ -1,9 +1,7 @@
 // This imports Express so we can build the server.
 import express from "express";
-// This imports path so we can build file paths safely.
-import path from "path";
-// This helps us get the current file path in ES modules.
-import { fileURLToPath } from "url";
+// This imports cors so the frontend can call the backend from another URL.
+import cors from "cors";
 
 // This imports the database client.
 import db from "./db/client.js";
@@ -17,12 +15,10 @@ import {
   getUserById,
 } from "./db/users.js";
 
-// This gets the current file name.
-const __filename = fileURLToPath(import.meta.url);
-// This gets the current folder name.
-const __dirname = path.dirname(__filename);
 // This sets the port for the server.
 const PORT = process.env.PORT || 3001;
+// This sets the frontend URL that is allowed to talk to this API.
+const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
 
 // This creates the Express app.
 const app = express();
@@ -36,8 +32,12 @@ await createTreesTable();
 
 // This lets the server read JSON from requests.
 app.use(express.json());
-// This serves the frontend files from the public folder.
-app.use(express.static(path.join(__dirname, "public")));
+// This allows the frontend to make requests to this backend.
+app.use(
+  cors({
+    origin: CORS_ORIGIN,
+  })
+);
 
 // This is a simple health route to check if the server is running.
 app.get("/api/health", (_request, response) => {
@@ -141,11 +141,6 @@ app.post("/api/trees", async (request, response) => {
   const tree = await createTree(userId, title, description || "", Boolean(isPublic));
   // This sends the new tree back to the client.
   response.status(201).json({ tree });
-});
-
-// This sends back the frontend page for any other route.
-app.use((_request, response) => {
-    response.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // This starts the server.
