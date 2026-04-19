@@ -1,5 +1,5 @@
-// This is the deployed backend URL.
-const API_URL = "https://caps-api.onrender.com";
+// This reads the backend URL from the Netlify environment variable.
+const API_URL = import.meta.env.VITE_API_URL;
 
 // These grab the forms and page elements from index.html.
 const authSection = document.querySelector("#auth-section");
