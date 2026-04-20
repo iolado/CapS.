@@ -17,8 +17,11 @@ import {
 
 // This sets the port for the server.
 const PORT = process.env.PORT || 3001;
-// This sets the frontend URL that is allowed to talk to this API.
-const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
+// These are the frontend URLs that are allowed to talk to this API.
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://caps-fe.netlify.app",
+];
 
 // This creates the Express app.
 const app = express();
@@ -35,7 +38,14 @@ app.use(express.json());
 // This allows the frontend to make requests to this backend.
 app.use(
   cors({
-    origin: CORS_ORIGIN,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
   })
 );
 
