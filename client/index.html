@@ -11,38 +11,43 @@
       <p class="eyebrow">Skill Tree Builder</p>
       <h1>Plan your learning with clear skill trees.</h1>
       <p class="hero-copy">
-        Build an account, log in, and create a skill tree for goals like frontend
-        development or data science.
+        Build an account, create a tree, add skills, connect prerequisites, and
+        track progress as you learn.
       </p>
     </header>
 
     <main class="page">
       <section id="auth-section" class="auth-grid">
         <section class="card">
-        <h2>Register</h2>
-        <form id="register-form" class="form">
-          <input id="register-name" type="text" placeholder="Name" required />
-          <input id="register-email" type="email" placeholder="Email" required />
-          <input id="register-password" type="password" placeholder="Password" required />
-          <button type="submit">Create Account</button>
-        </form>
+          <h2>Register</h2>
+          <form id="register-form" class="form">
+            <input id="register-name" type="text" placeholder="Name" required />
+            <input id="register-email" type="email" placeholder="Email" required />
+            <input id="register-password" type="password" placeholder="Password" required />
+            <button type="submit">Create Account</button>
+          </form>
         </section>
 
         <section class="card">
-        <h2>Login</h2>
-        <form id="login-form" class="form">
-          <input id="login-email" type="email" placeholder="Email" required />
-          <input id="login-password" type="password" placeholder="Password" required />
-          <button type="submit">Log In</button>
-        </form>
+          <h2>Login</h2>
+          <form id="login-form" class="form">
+            <input id="login-email" type="email" placeholder="Email" required />
+            <input id="login-password" type="password" placeholder="Password" required />
+            <button type="submit">Log In</button>
+          </form>
         </section>
       </section>
 
       <section class="card" id="dashboard-section">
-        <h2>Dashboard</h2>
-        <p id="current-user-message">Log in to see your trees.</p>
-
-        <button id="logout-button" class="secondary-button hidden" type="button">Log Out</button>
+        <div class="section-header">
+          <div>
+            <h2>Dashboard</h2>
+            <p id="current-user-message">Log in to see your trees.</p>
+          </div>
+          <button id="logout-button" class="secondary-button hidden" type="button">
+            Log Out
+          </button>
+        </div>
 
         <form id="tree-form" class="form hidden">
           <input id="tree-title" type="text" placeholder="Tree title" required />
@@ -55,6 +60,56 @@
         </form>
 
         <ul id="tree-list" class="tree-list"></ul>
+      </section>
+
+      <section id="tree-detail-section" class="card hidden">
+        <div class="section-header">
+          <div>
+            <h2 id="selected-tree-title">Tree Details</h2>
+            <p id="selected-tree-description">Choose a tree to manage its skills.</p>
+          </div>
+          <div class="button-row">
+            <button id="edit-tree-button" class="secondary-button" type="button">
+              Edit Tree
+            </button>
+            <button id="delete-tree-button" class="danger-button" type="button">
+              Delete Tree
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <section class="card inset-card">
+            <h3>Add Skill</h3>
+            <form id="skill-form" class="form">
+              <input id="skill-title" type="text" placeholder="Skill title" required />
+              <textarea id="skill-description" placeholder="Skill description"></textarea>
+              <input id="skill-difficulty" type="text" placeholder="Difficulty" />
+              <button type="submit">Add Skill</button>
+            </form>
+          </section>
+
+          <section class="card inset-card">
+            <h3>Progress Summary</h3>
+            <p id="tree-summary-message">No tree selected.</p>
+            <div id="progress-legend" class="legend">
+              <span class="legend-chip locked-chip">Locked</span>
+              <span class="legend-chip available-chip">Available</span>
+              <span class="legend-chip in-progress-chip">In Progress</span>
+              <span class="legend-chip completed-chip">Completed</span>
+            </div>
+          </section>
+        </div>
+
+        <section class="card inset-card">
+          <h3>Visual Skill Tree</h3>
+          <div id="skill-map" class="skill-map"></div>
+        </section>
+
+        <section class="card inset-card">
+          <h3>Skills</h3>
+          <ul id="skill-list" class="skill-list"></ul>
+        </section>
       </section>
 
       <p id="status-message" class="status-message"></p>

@@ -19,19 +19,20 @@ body {
 }
 
 .hero-copy {
-  max-width: 600px;
+  max-width: 650px;
   margin: 0.75rem auto 0;
 }
 
 .page {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 1.5rem;
   display: grid;
   gap: 1rem;
 }
 
-.auth-grid {
+.auth-grid,
+.detail-grid {
   display: grid;
   gap: 1rem;
 }
@@ -43,6 +44,18 @@ body {
   padding: 1rem;
 }
 
+.inset-card {
+  background: #fbfcfa;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .form {
   display: grid;
   gap: 0.75rem;
@@ -50,26 +63,50 @@ body {
 
 .form input,
 .form textarea,
+.form select,
 .form button {
   font: inherit;
   padding: 0.75rem;
 }
 
-.form button {
+.form button,
+.progress-button {
   border: 0;
   background: #1f5c46;
   color: white;
   cursor: pointer;
 }
 
-.secondary-button {
-  border: 1px solid #1f5c46;
-  background: white;
-  color: #1f5c46;
+.secondary-button,
+.small-button,
+.danger-button {
   cursor: pointer;
   font: inherit;
   padding: 0.65rem 1rem;
-  margin-bottom: 1rem;
+}
+
+.secondary-button,
+.small-button {
+  border: 1px solid #1f5c46;
+  background: white;
+  color: #1f5c46;
+}
+
+.danger-button {
+  border: 1px solid #b34444;
+  background: white;
+  color: #b34444;
+}
+
+.small-button {
+  padding: 0.45rem 0.75rem;
+}
+
+.button-row,
+.progress-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .checkbox-row {
@@ -82,7 +119,9 @@ body {
   display: none;
 }
 
-.tree-list {
+.tree-list,
+.skill-list,
+.prerequisite-list {
   list-style: none;
   padding: 0;
   margin: 1rem 0 0;
@@ -90,15 +129,86 @@ body {
   gap: 0.75rem;
 }
 
-.tree-item {
+.tree-item,
+.skill-item {
   border: 1px solid #d5ddd7;
   border-radius: 10px;
   padding: 0.75rem;
   background: #fbfcfa;
 }
 
-.tree-item h3 {
+.tree-item.is-selected {
+  border-color: #1f5c46;
+  background: #eef7f2;
+}
+
+.tree-item h3,
+.skill-item h3,
+.skill-map-card h3 {
   margin: 0 0 0.25rem;
+}
+
+.tree-actions,
+.skill-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.skill-map {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.skill-map-card {
+  border: 1px solid #d5ddd7;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.status-locked {
+  background: #f1f1f1;
+}
+
+.status-available {
+  background: #edf6ff;
+}
+
+.status-in_progress {
+  background: #fff7df;
+}
+
+.status-completed {
+  background: #e9f7ee;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.legend-chip {
+  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.locked-chip {
+  background: #f1f1f1;
+}
+
+.available-chip {
+  background: #edf6ff;
+}
+
+.in-progress-chip {
+  background: #fff7df;
+}
+
+.completed-chip {
+  background: #e9f7ee;
 }
 
 .status-message {
@@ -107,8 +217,21 @@ body {
   min-height: 1.5rem;
 }
 
+.inline-select-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.inline-select-row select {
+  flex: 1;
+  font: inherit;
+  padding: 0.55rem;
+}
+
 @media (min-width: 700px) {
-  .auth-grid {
+  .auth-grid,
+  .detail-grid {
     grid-template-columns: 1fr 1fr;
   }
 }

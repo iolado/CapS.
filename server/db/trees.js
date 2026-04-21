@@ -56,6 +56,31 @@ export async function createTree(userId, title, description, isPublic) {
   return tree;
 }
 
+// This function updates one tree.
+export async function updateTree(treeId, title, description, isPublic) {
+  // This updates the selected tree and returns the changed row.
+  const {
+    rows: [tree],
+  } = await db.query(
+    `UPDATE skill_trees
+     SET title = $2,
+         description = $3,
+         is_public = $4
+     WHERE id = $1
+     RETURNING *;`,
+    [treeId, title, description, isPublic]
+  );
+
+  // This returns the updated tree.
+  return tree;
+}
+
+// This function deletes one tree.
+export async function deleteTree(treeId) {
+  // This removes the selected tree from the table.
+  await db.query("DELETE FROM skill_trees WHERE id = $1;", [treeId]);
+}
+
 // This function creates the skill_trees table.
 export async function createTreesTable() {
   // This runs a CREATE TABLE query in PostgreSQL.
