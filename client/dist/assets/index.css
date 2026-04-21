@@ -1,0 +1,171 @@
+/* This is the built stylesheet for the frontend. */
+/* It controls the layout, colors, spacing, and dashboard styling. */
+body {
+  /* This removes the browser's default page margin. */
+  margin: 0;
+  /* This sets the main font for the page. */
+  font-family: Arial, sans-serif;
+  /* This sets the page background color. */
+  background: #f7f4ee;
+  /* This sets the main text color. */
+  color: #17352a;
+}
+/* This styles the top hero section. */
+.hero {
+  /* This adds space inside the hero section. */
+  padding: 3rem 1.5rem 2rem;
+  /* This sets the hero background color. */
+  background: #dcecdf;
+  /* This centers the hero text. */
+  text-align: center;
+}
+/* This styles the small label above the heading. */
+.eyebrow {
+  /* This removes the default paragraph margin. */
+  margin: 0;
+  /* This sets the label text size. */
+  font-size: 0.85rem;
+  /* This makes the label bold. */
+  font-weight: 700;
+  /* This turns the label text into uppercase. */
+  text-transform: uppercase;
+}
+/* This controls the paragraph under the hero heading. */
+.hero-copy {
+  /* This limits how wide the paragraph can become. */
+  max-width: 600px;
+  /* This centers the paragraph and adds top spacing. */
+  margin: 0.75rem auto 0;
+}
+/* This sets the main page layout. */
+.page {
+  /* This limits the overall page width. */
+  max-width: 900px;
+  /* This centers the page content. */
+  margin: 0 auto;
+  /* This adds spacing inside the page. */
+  padding: 1.5rem;
+  /* This uses CSS grid for the main layout. */
+  display: grid;
+  /* This adds space between grid items. */
+  gap: 1rem;
+}
+/* This places the register and login cards in a grid. */
+.auth-grid {
+  /* This uses CSS grid for the auth section. */
+  display: grid;
+  /* This adds space between the auth cards. */
+  gap: 1rem;
+}
+/* This styles each card on the page. */
+.card {
+  /* This sets the card background color. */
+  background: #fff;
+  /* This adds a border around the card. */
+  border: 1px solid #d5ddd7;
+  /* This rounds the card corners. */
+  border-radius: 12px;
+  /* This adds spacing inside the card. */
+  padding: 1rem;
+}
+/* This styles the forms and spaces the form elements. */
+.form {
+  /* This uses CSS grid for the form layout. */
+  display: grid;
+  /* This adds space between form fields. */
+  gap: 0.75rem;
+}
+.form input,
+.form textarea,
+.form button {
+  /* This makes form fields use the same font settings as the page. */
+  font: inherit;
+  /* This adds spacing inside each form field. */
+  padding: 0.75rem;
+}
+/* This styles the main form buttons. */
+.form button {
+  /* This removes the default button border. */
+  border: 0;
+  /* This sets the button background color. */
+  background: #1f5c46;
+  /* This sets the button text color. */
+  color: #fff;
+  /* This shows a pointer cursor when hovering the button. */
+  cursor: pointer;
+}
+/* This styles the logout button. */
+.secondary-button {
+  /* This adds a border around the button. */
+  border: 1px solid #1f5c46;
+  /* This sets the button background color. */
+  background: #fff;
+  /* This sets the button text color. */
+  color: #1f5c46;
+  /* This shows a pointer cursor when hovering the button. */
+  cursor: pointer;
+  /* This makes the button use the page font settings. */
+  font: inherit;
+  /* This adds spacing inside the button. */
+  padding: 0.65rem 1rem;
+  /* This adds space below the button. */
+  margin-bottom: 1rem;
+}
+/* This lines up the checkbox and its label. */
+.checkbox-row {
+  /* This puts the checkbox and text in a row. */
+  display: flex;
+  /* This vertically centers the checkbox and text. */
+  align-items: center;
+  /* This adds space between the checkbox and text. */
+  gap: 0.5rem;
+}
+/* This hides elements until they need to be shown. */
+.hidden {
+  /* This completely hides the element from the page. */
+  display: none;
+}
+/* This styles the list of skill trees. */
+.tree-list {
+  /* This removes the default list bullets. */
+  list-style: none;
+  /* This removes the default list padding. */
+  padding: 0;
+  /* This adds top spacing above the list. */
+  margin: 1rem 0 0;
+  /* This uses CSS grid for the list layout. */
+  display: grid;
+  /* This adds space between tree items. */
+  gap: 0.75rem;
+}
+/* This styles each tree card in the list. */
+.tree-item {
+  /* This adds a border around each tree item. */
+  border: 1px solid #d5ddd7;
+  /* This rounds the tree item corners. */
+  border-radius: 10px;
+  /* This adds spacing inside the tree item. */
+  padding: 0.75rem;
+  /* This sets the tree item background color. */
+  background: #fbfcfa;
+}
+.tree-item h3 {
+  /* This removes the default margin around the tree title. */
+  margin: 0 0 0.25rem;
+}
+/* This styles the message area at the bottom of the page. */
+.status-message {
+  /* This removes the default paragraph margin. */
+  margin: 0;
+  /* This centers the message text. */
+  text-align: center;
+  /* This keeps space on the page even when there is no message. */
+  min-height: 1.5rem;
+}
+/* This changes the layout on larger screens. */
+@media (min-width: 700px) {
+  .auth-grid {
+    /* This places the register and login cards in two columns on wider screens. */
+    grid-template-columns: 1fr 1fr;
+  }
+}
