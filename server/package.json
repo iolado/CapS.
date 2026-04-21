@@ -8,7 +8,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "db:schema": "psql postgres://ifeoladokun:password@localhost:5432/skill_tree_builder -f db/schema.sql",
-    "db:seed": "node --env-file=db/example.env db/seed.js"
+    "db:seed": "node --env-file=db/.env db/seed.js"
   },
   "repository": {
     "type": "git",
