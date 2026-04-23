@@ -21,6 +21,11 @@ const selectedTreeDescription = document.querySelector("#selected-tree-descripti
 const treeSummaryMessage = document.querySelector("#tree-summary-message");
 const editTreeButton = document.querySelector("#edit-tree-button");
 const deleteTreeButton = document.querySelector("#delete-tree-button");
+const registerNameInput = document.querySelector("#register-name");
+const registerEmailInput = document.querySelector("#register-email");
+const registerPasswordInput = document.querySelector("#register-password");
+const loginEmailInput = document.querySelector("#login-email");
+const loginPasswordInput = document.querySelector("#login-password");
 
 // These variables store the current frontend state while the page is open.
 // They are updated after login, tree selection, and API responses.
@@ -33,6 +38,29 @@ let selectedTreeSkills = [];
 function setStatus(message) {
   // This changes the text inside the status paragraph in client/index.html.
   statusMessage.textContent = message;
+}
+
+// WHY (Code Style + Documentation): Centralized input trimming keeps register/login logic
+// easier to read and avoids repeated selector + trim code in multiple handlers.
+function getTrimmedInputValue(inputElement) {
+  return String(inputElement?.value || "").trim();
+}
+
+// WHY (Functionality): Clearing auth fields after success/logout avoids stale credentials
+// staying in form inputs, which is safer and less confusing for users.
+function clearAuthForms() {
+  registerForm.reset();
+  loginForm.reset();
+}
+
+// WHY (Functionality + Code Style): One logout helper ensures manual logout and automatic
+// session-expiry logout keep the same UI state and localStorage behavior.
+function logoutCurrentUser(message = "Logged out.") {
+  currentUser = null;
+  saveCurrentUser();
+  updatePageForCurrentUser();
+  clearAuthForms();
+  setStatus(message);
 }
 
 // This helper saves the current user id in the browser's local storage.
@@ -122,6 +150,12 @@ async function sendRequest(path, options = {}) {
 
   // This checks whether the backend responded with an error status.
   if (!response.ok) {
+    // WHY (Functionality): If a protected request returns 401 while a user appears logged in,
+    // we reset frontend auth state so the app does not stay stuck in a broken "logged-in" UI.
+    if (response.status === 401 && currentUser && !path.startsWith("/api/auth/login")) {
+      logoutCurrentUser("Your session expired. Please log in again.");
+    }
+
     // This throws a JavaScript error so the calling code can show the message in the UI.
     throw new Error(data.error || "Something went wrong.");
   }
@@ -686,6 +720,10 @@ async function setCurrentUser(user, message) {
   // This updates the visible page layout for the logged-in state.
   updatePageForCurrentUser();
 
+  // WHY (Functionality): Clearing auth inputs after login/register success prevents showing
+  // old credentials if the auth section appears again later.
+  clearAuthForms();
+
   // This shows the success message.
   setStatus(message);
 
@@ -721,19 +759,32 @@ registerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   try {
+    const name = getTrimmedInputValue(registerNameInput);
+    const email = getTrimmedInputValue(registerEmailInput);
+    const password = registerPasswordInput.value;
+
+    // WHY (Functionality): Basic client-side checks give faster feedback and reduce avoidable
+    // auth request failures for blank/invalid register fields.
+    if (!name || !email || !password) {
+      setStatus("Name, email, and password are required.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setStatus("Please enter a valid email address.");
+      return;
+    }
+
     // This sends the register data to the backend register route in server/app.js.
     const data = await sendRequest("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: document.querySelector("#register-name").value,
-        email: document.querySelector("#register-email").value,
-        password: document.querySelector("#register-password").value,
+        name,
+        email,
+        password,
       }),
     });
-
-    // This clears the register form after success.
-    registerForm.reset();
 
     // This treats the new account as logged in right away.
     await setCurrentUser(data.user, "Account created. You are now logged in.");
@@ -749,18 +800,25 @@ loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   try {
+    const email = getTrimmedInputValue(loginEmailInput);
+    const password = loginPasswordInput.value;
+
+    // WHY (Functionality): Basic validation avoids sending incomplete login payloads and gives
+    // immediate, clearer feedback when required fields are missing.
+    if (!email || !password) {
+      setStatus("Email and password are required.");
+      return;
+    }
+
     // This sends the login data to the backend login route in server/app.js.
     const data = await sendRequest("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: document.querySelector("#login-email").value,
-        password: document.querySelector("#login-password").value,
+        email,
+        password,
       }),
     });
-
-    // This clears the login form after success.
-    loginForm.reset();
 
     // This stores the logged-in user and loads their dashboard.
     await setCurrentUser(data.user, "Logged in successfully.");
@@ -927,17 +985,9 @@ deleteTreeButton.addEventListener("click", async () => {
 
 // This event listener runs when the logout button is clicked.
 logoutButton.addEventListener("click", () => {
-  // This clears the current user from memory.
-  currentUser = null;
-
-  // This removes the saved user id from local storage.
-  saveCurrentUser();
-
-  // This switches the page back to the logged-out layout.
-  updatePageForCurrentUser();
-
-  // This shows a logout message.
-  setStatus("Logged out.");
+  // WHY (Code Style + Functionality): Reusing one logout helper keeps logout behavior
+  // consistent anywhere auth state needs to be reset.
+  logoutCurrentUser("Logged out.");
 });
 
 // This sets the page to the correct visual state when the page first loads.

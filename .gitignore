@@ -1,0 +1,48 @@
+# WHY: This file keeps generated files, local settings, and secrets out of Git so commits stay clean and safe.
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+server/dist/
+build/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!server/db/example.env
+
+# Logs and runtime files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# Test and coverage
+coverage/
+.nyc_output/
+
+# Cache and temp
+.tmp/
+tmp/
+.cache/
+.parcel-cache/
+.vite/
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Optional local database dumps
+*.sql.gz
+*.dump

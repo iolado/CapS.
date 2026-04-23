@@ -1,6 +1,7 @@
 // This imports Express from the express package.
 // Express is the backend framework that helps us create routes and send responses.
 import express from "express";
+import bcrypt from "bcrypt";
 
 // This imports the cors package.
 // This lets the frontend talk to the backend when they are running on different URLs or ports.
@@ -80,6 +81,59 @@ const allowedStatuses = ["locked", "in_progress", "completed"];
 // The rest of this file adds routes and middleware to this app.
 const app = express();
 
+// WHY (Functionality + Documentation): Auth code is easier to maintain when password rules
+// are defined in one place, and this keeps password hashing consistent across register/login.
+const BCRYPT_SALT_ROUNDS = 10;
+
+// WHY (Functionality): Normalizing emails avoids duplicate accounts like Test@Email.com
+// and test@email.com behaving like different users.
+function normalizeEmail(email) {
+  return String(email || "")
+    .trim()
+    .toLowerCase();
+}
+
+// WHY (Functionality + Documentation): Returning user records without password_hash prevents
+// exposing sensitive fields and makes API responses safer for normal use.
+function toSafeUser(user) {
+  if (!user) {
+    return null;
+  }
+
+  // WHY (Code Style + Documentation): Explicitly listing safe fields is easier for beginners
+  // to read, and it prevents accidental exposure of sensitive columns.
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    created_at: user.created_at,
+  };
+}
+
+// WHY (Functionality): We hash passwords before saving so stolen database rows do not contain
+// readable passwords, which protects the core login/register user flow.
+async function hashPassword(password) {
+  // WHY (Functionality): bcrypt is a standard password-hashing library for login/register flows.
+  // Using it makes stored passwords safer without changing the API contract.
+  return bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+}
+
+// WHY (Functionality + Code Style): Centralizing password verification keeps login behavior
+// consistent and easier for beginners to reason about in one helper.
+async function verifyPassword(password, storedPasswordHash) {
+  // WHY (Functionality): Some existing beginner data may still be plain text.
+  // This fallback avoids breaking login while newer users are stored as hashes.
+  if (!storedPasswordHash || !storedPasswordHash.startsWith("$2")) {
+    return storedPasswordHash === password;
+  }
+
+  try {
+    return await bcrypt.compare(password, storedPasswordHash);
+  } catch {
+    return false;
+  }
+}
+
 // This opens the database connection before the server starts handling requests.
 // The db object comes from db/client.js.
 await db.connect();
@@ -124,7 +178,7 @@ app.use(
       // This tells cors to block any origin that is not allowed.
       callback(new Error("Not allowed by CORS"));
     },
-  })
+  }),
 );
 
 // This helper function reads the user id from a request.
@@ -142,13 +196,15 @@ function buildSkillDetails(skill, prerequisiteRows, progressRows) {
   const progress = progressRows.find((row) => row.skill_id === skill.id);
 
   // This finds all prerequisite rows that belong to this skill.
-  const prerequisites = prerequisiteRows.filter((row) => row.skill_id === skill.id);
+  const prerequisites = prerequisiteRows.filter(
+    (row) => row.skill_id === skill.id,
+  );
 
   // This counts how many prerequisite skills are already completed.
   const completedPrerequisites = prerequisites.filter((prerequisite) => {
     // This finds the saved progress row for the prerequisite skill.
     const prerequisiteProgress = progressRows.find(
-      (row) => row.skill_id === prerequisite.prerequisite_skill_id
+      (row) => row.skill_id === prerequisite.prerequisite_skill_id,
     );
 
     // This returns true only when that prerequisite is completed.
@@ -209,7 +265,7 @@ async function buildTreeDetails(userId, treeId) {
 
   // This builds a frontend-friendly version of every skill by using the helper above.
   const skillsWithDetails = skills.map((skill) =>
-    buildSkillDetails(skill, prerequisiteRows, progressRows)
+    buildSkillDetails(skill, prerequisiteRows, progressRows),
   );
 
   // This returns the combined tree detail object to the route that called it.
@@ -263,52 +319,63 @@ app.get("/api/health", (_request, response) => {
 app.post("/api/auth/register", async (request, response) => {
   // This pulls the name, email, and password from the request body sent by the frontend.
   const { name, email, password } = request.body;
+  const normalizedEmail = normalizeEmail(email);
+  const trimmedName = String(name || "").trim();
 
   // This checks that all three required values were sent.
-  if (!name || !email || !password) {
-    response.status(400).json({ error: "Name, email, and password are required." });
+  // WHY (Functionality): Trimming and validating inputs reduces avoidable account bugs from
+  // accidental whitespace and keeps register behavior reliable for normal use.
+  if (!trimmedName || !normalizedEmail || !password) {
+    response
+      .status(400)
+      .json({ error: "Name, email, and password are required." });
     return;
   }
 
   // This looks for an existing user with the same email.
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await getUserByEmail(normalizedEmail);
 
   // This blocks duplicate accounts.
   if (existingUser) {
-    response.status(409).json({ error: "A user with that email already exists." });
+    response
+      .status(409)
+      .json({ error: "A user with that email already exists." });
     return;
   }
 
   // This creates the new user by calling the helper in db/users.js.
-  const user = await createUser(name, email, password);
+  // WHY (Functionality): Hashing before insert means we never store readable passwords.
+  const passwordHash = await hashPassword(password);
+  const user = await createUser(trimmedName, normalizedEmail, passwordHash);
 
   // This sends the new user row back to the frontend as JSON.
-  response.status(201).json({ user });
+  response.status(201).json({ user: toSafeUser(user) });
 });
 
 // This route logs in an existing user.
 app.post("/api/auth/login", async (request, response) => {
   // This reads the email and password from the frontend request body.
   const { email, password } = request.body;
+  const normalizedEmail = normalizeEmail(email);
 
   // This checks that both values were provided.
-  if (!email || !password) {
+  if (!normalizedEmail || !password) {
     response.status(400).json({ error: "Email and password are required." });
     return;
   }
 
   // This looks up the user by email.
-  const user = await getUserByEmail(email);
+  const user = await getUserByEmail(normalizedEmail);
 
   // This checks that the user exists and that the password matches.
-  // In this beginner version, the password is stored directly instead of being hashed.
-  if (!user || user.password_hash !== password) {
+  // WHY (Functionality): Compare against hashed passwords to keep login secure and dependable.
+  if (!user || !(await verifyPassword(password, user.password_hash))) {
     response.status(401).json({ error: "Email or password is incorrect." });
     return;
   }
 
   // This sends the matching user row back to the frontend.
-  response.json({ user });
+  response.json({ user: toSafeUser(user) });
 });
 
 // This route gets the current user by userId.
@@ -323,7 +390,8 @@ app.get("/api/auth/me", async (request, response) => {
   }
 
   // This sends the user row back to the frontend.
-  response.json({ user });
+  // WHY (Functionality): /me should follow the same safe response shape as other auth routes.
+  response.json({ user: toSafeUser(user) });
 });
 
 // This route gets one user by id directly from the URL.
@@ -338,7 +406,8 @@ app.get("/api/users/:id", async (request, response) => {
   }
 
   // This sends the user row back to the client.
-  response.json({ user });
+  // WHY (Functionality): Keep user responses consistent and avoid leaking password_hash.
+  response.json({ user: toSafeUser(user) });
 });
 
 // This route gets all trees for the current user.
@@ -378,7 +447,12 @@ app.post("/api/trees", async (request, response) => {
   }
 
   // This creates the tree by calling the helper in db/trees.js.
-  const tree = await createTree(user.id, title, description || "", Boolean(isPublic));
+  const tree = await createTree(
+    user.id,
+    title,
+    description || "",
+    Boolean(isPublic),
+  );
 
   // This sends the new tree row back to the frontend.
   response.status(201).json({ tree });
@@ -405,7 +479,9 @@ app.get("/api/trees/:treeId", async (request, response) => {
 
   // This makes sure the tree belongs to the current user.
   if (detail.tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this tree." });
+    response
+      .status(403)
+      .json({ error: "You do not have access to this tree." });
     return;
   }
 
@@ -434,7 +510,9 @@ app.patch("/api/trees/:treeId", async (request, response) => {
 
   // This blocks a user from editing a tree they do not own.
   if (tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this tree." });
+    response
+      .status(403)
+      .json({ error: "You do not have access to this tree." });
     return;
   }
 
@@ -452,7 +530,7 @@ app.patch("/api/trees/:treeId", async (request, response) => {
     tree.id,
     title,
     description || "",
-    Boolean(isPublic)
+    Boolean(isPublic),
   );
 
   // This sends the updated tree row back to the frontend.
@@ -480,7 +558,9 @@ app.delete("/api/trees/:treeId", async (request, response) => {
 
   // This blocks a user from deleting a tree they do not own.
   if (tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this tree." });
+    response
+      .status(403)
+      .json({ error: "You do not have access to this tree." });
     return;
   }
 
@@ -530,7 +610,9 @@ app.post("/api/trees/:treeId/skills", async (request, response) => {
 
   // This blocks a user from adding skills to another user's tree.
   if (tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this tree." });
+    response
+      .status(403)
+      .json({ error: "You do not have access to this tree." });
     return;
   }
 
@@ -544,7 +626,12 @@ app.post("/api/trees/:treeId/skills", async (request, response) => {
   }
 
   // This creates the skill by calling the helper in db/skills.js.
-  const skill = await createSkill(tree.id, title, description || "", difficulty || "");
+  const skill = await createSkill(
+    tree.id,
+    title,
+    description || "",
+    difficulty || "",
+  );
 
   // This sends the new skill row back to the frontend.
   response.status(201).json({ skill });
@@ -574,7 +661,9 @@ app.patch("/api/skills/:skillId", async (request, response) => {
 
   // This blocks a user from editing another user's skill.
   if (tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this skill." });
+    response
+      .status(403)
+      .json({ error: "You do not have access to this skill." });
     return;
   }
 
@@ -592,7 +681,7 @@ app.patch("/api/skills/:skillId", async (request, response) => {
     skill.id,
     title,
     description || "",
-    difficulty || ""
+    difficulty || "",
   );
 
   // This sends the updated skill row back to the frontend.
@@ -623,7 +712,9 @@ app.delete("/api/skills/:skillId", async (request, response) => {
 
   // This blocks a user from deleting another user's skill.
   if (tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this skill." });
+    response
+      .status(403)
+      .json({ error: "You do not have access to this skill." });
     return;
   }
 
@@ -676,7 +767,9 @@ app.post("/api/skills/:skillId/prerequisites", async (request, response) => {
 
   // This blocks a user from editing another user's skill.
   if (tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this skill." });
+    response
+      .status(403)
+      .json({ error: "You do not have access to this skill." });
     return;
   }
 
@@ -700,13 +793,18 @@ app.post("/api/skills/:skillId/prerequisites", async (request, response) => {
 
   // This checks that the chosen prerequisite is in the same tree.
   if (!prerequisiteSkill || prerequisiteSkill.tree_id !== skill.tree_id) {
-    response.status(400).json({ error: "Choose a prerequisite from the same tree." });
+    response
+      .status(400)
+      .json({ error: "Choose a prerequisite from the same tree." });
     return;
   }
 
   // This tries to save the new prerequisite relationship.
   try {
-    const prerequisite = await createPrerequisite(skill.id, prerequisiteSkillId);
+    const prerequisite = await createPrerequisite(
+      skill.id,
+      prerequisiteSkillId,
+    );
     response.status(201).json({ prerequisite });
   } catch {
     // This handles duplicate prerequisite rows.
@@ -715,39 +813,44 @@ app.post("/api/skills/:skillId/prerequisites", async (request, response) => {
 });
 
 // This route deletes one prerequisite relationship.
-app.delete("/api/skills/:skillId/prerequisites/:prereqId", async (request, response) => {
-  // This validates the user first.
-  const user = await requireUser(request, response);
+app.delete(
+  "/api/skills/:skillId/prerequisites/:prereqId",
+  async (request, response) => {
+    // This validates the user first.
+    const user = await requireUser(request, response);
 
-  // This stops the route if the helper already sent an error response.
-  if (!user) {
-    return;
-  }
+    // This stops the route if the helper already sent an error response.
+    if (!user) {
+      return;
+    }
 
-  // This loads the selected skill.
-  const skill = await getSkillById(Number(request.params.skillId));
+    // This loads the selected skill.
+    const skill = await getSkillById(Number(request.params.skillId));
 
-  // This sends an error if the skill does not exist.
-  if (!skill) {
-    response.status(404).json({ error: "Skill not found." });
-    return;
-  }
+    // This sends an error if the skill does not exist.
+    if (!skill) {
+      response.status(404).json({ error: "Skill not found." });
+      return;
+    }
 
-  // This loads the skill's tree so ownership can be checked.
-  const tree = await getTreeById(skill.tree_id);
+    // This loads the skill's tree so ownership can be checked.
+    const tree = await getTreeById(skill.tree_id);
 
-  // This blocks a user from editing another user's skill.
-  if (tree.user_id !== user.id) {
-    response.status(403).json({ error: "You do not have access to this skill." });
-    return;
-  }
+    // This blocks a user from editing another user's skill.
+    if (tree.user_id !== user.id) {
+      response
+        .status(403)
+        .json({ error: "You do not have access to this skill." });
+      return;
+    }
 
-  // This deletes the prerequisite row by calling the helper in db/prerequisites.js.
-  await deletePrerequisite(Number(request.params.prereqId));
+    // This deletes the prerequisite row by calling the helper in db/prerequisites.js.
+    await deletePrerequisite(Number(request.params.prereqId));
 
-  // This sends a simple success message back to the frontend.
-  response.json({ message: "Prerequisite deleted." });
-});
+    // This sends a simple success message back to the frontend.
+    response.json({ message: "Prerequisite deleted." });
+  },
+);
 
 // This route gets progress for all skills in one tree.
 app.get("/api/trees/:treeId/progress", async (request, response) => {
@@ -804,7 +907,10 @@ app.patch("/api/skills/:skillId/progress", async (request, response) => {
   }
 
   // This checks whether all prerequisites are completed for this skill.
-  const prerequisitesCompleted = await prerequisitesAreCompleted(user.id, skill.id);
+  const prerequisitesCompleted = await prerequisitesAreCompleted(
+    user.id,
+    skill.id,
+  );
 
   // This checks how many prerequisites this skill has.
   const prerequisiteCount = await countPrerequisitesForSkill(skill.id);
@@ -844,7 +950,9 @@ app.get("/api/dashboard", async (request, response) => {
     const detail = await buildTreeDetails(user.id, tree.id);
 
     // This counts how many skills are completed in that tree.
-    const completedCount = detail.skills.filter((skill) => skill.status === "completed").length;
+    const completedCount = detail.skills.filter(
+      (skill) => skill.status === "completed",
+    ).length;
 
     // This adds a summary object into the final summary list.
     summary.push({

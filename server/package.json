@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "db:schema": "psql postgresql://caps_u15w_user:6w8971yQYiqILNmCGZtFSMrjWTK0fhxk@dpg-d7hv4tkvikkc73ahb5d0-a.virginia-postgres.render.com/caps_u15w -f db/schema.sql", 
+    "db:schema": "psql postgresql://caps_u15w_user:6w8971yQYiqILNmCGZtFSMrjWTK0fhxk@dpg-d7hv4tkvikkc73ahb5d0-a.virginia-postgres.render.com/caps_u15w -f db/schema.sql",
     "db:seed": "npm run db:schema && node --env-file=db/.env db/seed.js"
   },
   "repository": {
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/iolado/CapS.#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "nodemon": "^3.1.14",
