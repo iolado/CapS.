@@ -1,9 +1,11 @@
-// This imports the database client from client.js.
+// This imports the shared database client from client.js.
+// This file uses that client to send SQL queries to PostgreSQL.
 import db from "./client.js";
 
 // This function gets all prerequisite rows for one skill.
 export async function getPrerequisitesBySkillId(skillId) {
-  // This finds every prerequisite tied to the selected skill.
+  // This runs a query that joins skill_prerequisites with skills.
+  // The join lets us get the title of the prerequisite skill.
   const { rows } = await db.query(
     `SELECT skill_prerequisites.id,
             skill_prerequisites.skill_id,
@@ -16,14 +18,15 @@ export async function getPrerequisitesBySkillId(skillId) {
     [skillId]
   );
 
-  // This returns the prerequisite list.
+  // This returns the list of prerequisite rows for that skill.
   return rows;
 }
 
 // This function creates one prerequisite relationship.
 export async function createPrerequisite(skillId, prerequisiteSkillId) {
-  // This adds one relationship between two skills.
+  // This runs an INSERT query that connects one skill to another skill.
   const {
+    // This takes the inserted row that PostgreSQL returns and stores it in a variable called prerequisite.
     rows: [prerequisite],
   } = await db.query(
     `INSERT INTO skill_prerequisites (skill_id, prerequisite_skill_id)
@@ -32,20 +35,21 @@ export async function createPrerequisite(skillId, prerequisiteSkillId) {
     [skillId, prerequisiteSkillId]
   );
 
-  // This returns the new relationship.
+  // This returns the new prerequisite row.
   return prerequisite;
 }
 
 // This function deletes one prerequisite relationship.
 export async function deletePrerequisite(prerequisiteId) {
-  // This removes the relationship from the table.
+  // This runs a DELETE query that removes the selected prerequisite row.
   await db.query("DELETE FROM skill_prerequisites WHERE id = $1;", [prerequisiteId]);
 }
 
-// This function checks whether a skill has prerequisites.
+// This function counts how many prerequisites one skill has.
 export async function countPrerequisitesForSkill(skillId) {
-  // This counts the number of prerequisite rows for the selected skill.
+  // This runs a COUNT query and returns the number as an integer.
   const {
+    // This takes the first returned row and stores it in a variable called result.
     rows: [result],
   } = await db.query(
     `SELECT COUNT(*)::INTEGER AS count
@@ -54,13 +58,13 @@ export async function countPrerequisitesForSkill(skillId) {
     [skillId]
   );
 
-  // This returns the count.
+  // This returns the count number from the result row.
   return result.count;
 }
 
-// This function creates the skill_prerequisites table.
+// This function creates the skill_prerequisites table if it does not already exist.
 export async function createSkillPrerequisitesTable() {
-  // This creates the table if it does not already exist.
+  // This sends a CREATE TABLE query to PostgreSQL.
   await db.query(`
     CREATE TABLE IF NOT EXISTS skill_prerequisites (
       id SERIAL PRIMARY KEY,

@@ -1,235 +1,427 @@
+/* This styles the whole page body. */
 body {
+  /* This removes the default outer margin from the browser. */
   margin: 0;
+
+  /* This sets the main font for the page. */
   font-family: Arial, sans-serif;
+
+  /* This sets the light page background color. */
   background: #f7f4ee;
+
+  /* This sets the main text color. */
   color: #17352a;
 }
 
+/* This styles the hero section at the top of the page. */
 .hero {
+  /* This adds space inside the hero section. */
   padding: 3rem 1.5rem 2rem;
+
+  /* This sets the hero background color. */
   background: #dcecdf;
+
+  /* This centers the hero text. */
   text-align: center;
 }
 
+/* This styles the small uppercase label at the top of the hero. */
 .eyebrow {
+  /* This removes the default paragraph margin. */
   margin: 0;
+
+  /* This makes the text slightly smaller. */
   font-size: 0.85rem;
+
+  /* This makes the text bold. */
   font-weight: bold;
+
+  /* This turns the text into uppercase letters. */
   text-transform: uppercase;
 }
 
+/* This styles the smaller hero paragraph. */
 .hero-copy {
+  /* This limits how wide the paragraph can be. */
   max-width: 650px;
+
+  /* This centers the paragraph and adds top spacing. */
   margin: 0.75rem auto 0;
 }
 
+/* This styles the main page wrapper. */
 .page {
+  /* This limits the content width. */
   max-width: 1100px;
+
+  /* This centers the page content. */
   margin: 0 auto;
+
+  /* This adds space inside the page wrapper. */
   padding: 1.5rem;
+
+  /* This uses CSS grid for stacked sections. */
   display: grid;
+
+  /* This adds space between sections. */
   gap: 1rem;
 }
 
+/* This styles the auth and detail grids. */
 .auth-grid,
 .detail-grid {
+  /* This turns those sections into grid layouts. */
   display: grid;
+
+  /* This adds space between grid items. */
   gap: 1rem;
 }
 
+/* This styles the general white card look used across the app. */
 .card {
+  /* This sets the card background color. */
   background: white;
+
+  /* This adds a soft border around the card. */
   border: 1px solid #d5ddd7;
+
+  /* This rounds the card corners. */
   border-radius: 12px;
+
+  /* This adds space inside the card. */
   padding: 1rem;
 }
 
+/* This styles cards that sit inside another main card. */
 .inset-card {
+  /* This gives inset cards a slightly softer background. */
   background: #fbfcfa;
 }
 
+/* This styles headers that need space between left and right content. */
 .section-header {
+  /* This lines child elements up in one row. */
   display: flex;
+
+  /* This pushes left and right content apart. */
   justify-content: space-between;
+
+  /* This lines items up at the top. */
   align-items: flex-start;
+
+  /* This adds space between child elements. */
   gap: 1rem;
+
+  /* This adds bottom space below the header row. */
   margin-bottom: 1rem;
 }
 
+/* This styles forms throughout the app. */
 .form {
+  /* This makes form fields stack in a grid. */
   display: grid;
+
+  /* This adds space between fields. */
   gap: 0.75rem;
 }
 
+/* This styles inputs, textareas, selects, and form buttons. */
 .form input,
 .form textarea,
 .form select,
 .form button {
+  /* This keeps the same font as the rest of the page. */
   font: inherit;
+
+  /* This adds inner spacing inside the controls. */
   padding: 0.75rem;
 }
 
+/* This styles main form buttons and progress buttons. */
 .form button,
 .progress-button {
+  /* This removes the default border. */
   border: 0;
+
+  /* This sets the main green button color. */
   background: #1f5c46;
+
+  /* This makes button text white. */
   color: white;
+
+  /* This shows a pointer cursor on hover. */
   cursor: pointer;
 }
 
+/* This styles shared button classes. */
 .secondary-button,
 .small-button,
 .danger-button {
+  /* This shows a pointer cursor on hover. */
   cursor: pointer;
+
+  /* This keeps the same font as the page. */
   font: inherit;
+
+  /* This adds button padding. */
   padding: 0.65rem 1rem;
 }
 
+/* This styles regular outlined buttons. */
 .secondary-button,
 .small-button {
+  /* This adds a green border. */
   border: 1px solid #1f5c46;
+
+  /* This keeps the background white. */
   background: white;
+
+  /* This makes the text green. */
   color: #1f5c46;
 }
 
+/* This styles the delete button. */
 .danger-button {
+  /* This adds a red border. */
   border: 1px solid #b34444;
+
+  /* This keeps the background white. */
   background: white;
+
+  /* This makes the text red. */
   color: #b34444;
 }
 
+/* This styles smaller action buttons. */
 .small-button {
+  /* This makes the button shorter than the main buttons. */
   padding: 0.45rem 0.75rem;
 }
 
+/* This styles rows that hold several buttons. */
 .button-row,
 .progress-row {
+  /* This puts buttons in a row. */
   display: flex;
+
+  /* This lets buttons wrap to a new line if needed. */
   flex-wrap: wrap;
+
+  /* This adds space between buttons. */
   gap: 0.5rem;
 }
 
+/* This styles the checkbox label row. */
 .checkbox-row {
+  /* This lines the checkbox and text up in one row. */
   display: flex;
+
+  /* This aligns items vertically. */
   align-items: center;
+
+  /* This adds space between the checkbox and the text. */
   gap: 0.5rem;
 }
 
+/* This hides elements from the page. */
 .hidden {
+  /* This removes the element from layout and view. */
   display: none;
 }
 
+/* This styles the lists used for trees, skills, and prerequisites. */
 .tree-list,
 .skill-list,
 .prerequisite-list {
+  /* This removes the default bullet points. */
   list-style: none;
+
+  /* This removes the default left padding. */
   padding: 0;
+
+  /* This adds top space above the list. */
   margin: 1rem 0 0;
+
+  /* This uses grid layout for even spacing. */
   display: grid;
+
+  /* This adds space between list items. */
   gap: 0.75rem;
 }
 
+/* This styles each tree item and each skill item card. */
 .tree-item,
 .skill-item {
+  /* This adds a soft border. */
   border: 1px solid #d5ddd7;
+
+  /* This rounds the item corners. */
   border-radius: 10px;
+
+  /* This adds inner spacing. */
   padding: 0.75rem;
+
+  /* This sets the item background color. */
   background: #fbfcfa;
 }
 
+/* This styles the currently selected tree in the list. */
 .tree-item.is-selected {
+  /* This changes the border color so the selected tree stands out. */
   border-color: #1f5c46;
+
+  /* This gives the selected tree a different background color. */
   background: #eef7f2;
 }
 
+/* This styles the headings inside trees, skills, and skill map cards. */
 .tree-item h3,
 .skill-item h3,
 .skill-map-card h3 {
+  /* This removes the default top margin and adds a small bottom margin. */
   margin: 0 0 0.25rem;
 }
 
+/* This styles the tree and skill action rows. */
 .tree-actions,
 .skill-actions {
+  /* This lines the buttons up in a row. */
   display: flex;
+
+  /* This allows wrapping if there are many buttons. */
   flex-wrap: wrap;
+
+  /* This adds space between buttons. */
   gap: 0.5rem;
+
+  /* This adds space above the action row. */
   margin-top: 0.75rem;
 }
 
+/* This styles the skill map area. */
 .skill-map {
+  /* This uses grid layout for the skill cards. */
   display: grid;
+
+  /* This adds space between skill cards. */
   gap: 0.75rem;
 }
 
+/* This styles one skill map card. */
 .skill-map-card {
+  /* This adds a border around the card. */
   border: 1px solid #d5ddd7;
+
+  /* This rounds the card corners. */
   border-radius: 10px;
+
+  /* This adds inner spacing. */
   padding: 0.75rem;
 }
 
+/* This background is used for locked skills. */
 .status-locked {
   background: #f1f1f1;
 }
 
+/* This background is used for available skills. */
 .status-available {
   background: #edf6ff;
 }
 
+/* This background is used for in-progress skills. */
 .status-in_progress {
   background: #fff7df;
 }
 
+/* This background is used for completed skills. */
 .status-completed {
   background: #e9f7ee;
 }
 
+/* This styles the status legend container. */
 .legend {
+  /* This lines the legend chips up in a row. */
   display: flex;
+
+  /* This allows the chips to wrap if needed. */
   flex-wrap: wrap;
+
+  /* This adds space between legend chips. */
   gap: 0.5rem;
 }
 
+/* This styles one legend chip. */
 .legend-chip {
+  /* This makes the chip pill-shaped. */
   border-radius: 999px;
+
+  /* This adds padding inside the chip. */
   padding: 0.3rem 0.6rem;
+
+  /* This makes the chip text a little smaller. */
   font-size: 0.85rem;
 }
 
+/* This sets the legend color for locked skills. */
 .locked-chip {
   background: #f1f1f1;
 }
 
+/* This sets the legend color for available skills. */
 .available-chip {
   background: #edf6ff;
 }
 
+/* This sets the legend color for in-progress skills. */
 .in-progress-chip {
   background: #fff7df;
 }
 
+/* This sets the legend color for completed skills. */
 .completed-chip {
   background: #e9f7ee;
 }
 
+/* This styles the status message area. */
 .status-message {
+  /* This removes the default paragraph margin. */
   margin: 0;
+
+  /* This centers the status text. */
   text-align: center;
+
+  /* This keeps some space reserved even when the message is empty. */
   min-height: 1.5rem;
 }
 
+/* This styles the row that holds the prerequisite select and button. */
 .inline-select-row {
+  /* This lines the select and button up in one row. */
   display: flex;
+
+  /* This adds space between them. */
   gap: 0.5rem;
+
+  /* This adds top spacing above the row. */
   margin-top: 0.75rem;
 }
 
+/* This styles the select box inside the inline row. */
 .inline-select-row select {
+  /* This makes the select take up the leftover width. */
   flex: 1;
+
+  /* This keeps the same font as the rest of the page. */
   font: inherit;
+
+  /* This adds padding inside the select. */
   padding: 0.55rem;
 }
 
+/* This media query runs on screens that are at least 700px wide. */
 @media (min-width: 700px) {
+  /* This changes the auth and detail grids into two-column layouts on larger screens. */
   .auth-grid,
   .detail-grid {
     grid-template-columns: 1fr 1fr;

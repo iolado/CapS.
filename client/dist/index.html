@@ -1,120 +1,193 @@
 <!doctype html>
+<!-- This tells the browser the file is an HTML5 document. -->
 <html lang="en">
+  <!-- This is the root HTML element, and lang="en" says the page content is in English. -->
   <head>
+    <!-- This starts the head section, which stores page setup information. -->
     <meta charset="UTF-8" />
+    <!-- This tells the browser to use UTF-8 text encoding. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- This makes the page scale correctly on phones and tablets. -->
     <title>Skill Tree Builder</title>
+    <!-- This sets the browser tab title. -->
+    <!-- This loads client/styles.css so the page has styling. -->
     <script type="module" crossorigin src="/assets/index-Bl-piz-V.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-Bw5gwQXY.css">
   </head>
   <body>
+    <!-- This starts the visible content of the page. -->
     <header class="hero">
+      <!-- This creates the top hero section of the page. -->
       <p class="eyebrow">Skill Tree Builder</p>
+      <!-- This shows the small label at the top of the hero. -->
       <h1>Plan your learning with clear skill trees.</h1>
+      <!-- This shows the main page heading. -->
       <p class="hero-copy">
+        <!-- This shows a short summary of what the app does. -->
         Build an account, create a tree, add skills, connect prerequisites, and
         track progress as you learn.
       </p>
     </header>
 
     <main class="page">
+      <!-- This wraps the main page content below the hero section. -->
       <section id="auth-section" class="auth-grid">
+        <!-- This section holds the register and login cards. -->
         <section class="card">
+          <!-- This is the register card. -->
           <h2>Register</h2>
+          <!-- This is the register heading. -->
           <form id="register-form" class="form">
+            <!-- This is the register form. client/script.js listens for this form being submitted. -->
             <input id="register-name" type="text" placeholder="Name" required />
+            <!-- This input stores the user's name. -->
             <input id="register-email" type="email" placeholder="Email" required />
+            <!-- This input stores the user's email. -->
             <input id="register-password" type="password" placeholder="Password" required />
+            <!-- This input stores the user's password. -->
             <button type="submit">Create Account</button>
+            <!-- This button submits the register form to client/script.js. -->
           </form>
         </section>
 
         <section class="card">
+          <!-- This is the login card. -->
           <h2>Login</h2>
+          <!-- This is the login heading. -->
           <form id="login-form" class="form">
+            <!-- This is the login form. client/script.js listens for this form being submitted. -->
             <input id="login-email" type="email" placeholder="Email" required />
+            <!-- This input stores the login email. -->
             <input id="login-password" type="password" placeholder="Password" required />
+            <!-- This input stores the login password. -->
             <button type="submit">Log In</button>
+            <!-- This button submits the login form to client/script.js. -->
           </form>
         </section>
       </section>
 
       <section class="card" id="dashboard-section">
+        <!-- This card is the dashboard section that shows trees and user status. -->
         <div class="section-header">
+          <!-- This wraps the dashboard heading and the logout button. -->
           <div>
+            <!-- This groups the heading and user message together. -->
             <h2>Dashboard</h2>
+            <!-- This is the dashboard heading. -->
             <p id="current-user-message">Log in to see your trees.</p>
+            <!-- client/script.js updates this message after login and logout. -->
           </div>
           <button id="logout-button" class="secondary-button hidden" type="button">
+            <!-- This logout button starts hidden and is shown after login. -->
             Log Out
           </button>
         </div>
 
         <form id="tree-form" class="form hidden">
+          <!-- This form creates a new skill tree and starts hidden until a user logs in. -->
           <input id="tree-title" type="text" placeholder="Tree title" required />
+          <!-- This input stores the tree title. -->
           <textarea id="tree-description" placeholder="Tree description"></textarea>
+          <!-- This textarea stores the tree description. -->
           <label class="checkbox-row">
+            <!-- This label groups the public checkbox and its text together. -->
             <input id="tree-public" type="checkbox" />
+            <!-- This checkbox controls whether the tree is public. -->
             <span>Make this tree public</span>
+            <!-- This is the label text next to the checkbox. -->
           </label>
           <button type="submit">Create Tree</button>
+          <!-- This button submits the tree form to client/script.js. -->
         </form>
 
         <ul id="tree-list" class="tree-list"></ul>
+        <!-- client/script.js fills this list with the user's trees. -->
       </section>
 
       <section id="tree-detail-section" class="card hidden">
+        <!-- This section shows the currently selected tree and starts hidden until a tree is opened. -->
         <div class="section-header">
+          <!-- This wraps the tree heading and the tree action buttons. -->
           <div>
+            <!-- This groups the selected tree title and description together. -->
             <h2 id="selected-tree-title">Tree Details</h2>
+            <!-- client/script.js updates this with the selected tree title. -->
             <p id="selected-tree-description">Choose a tree to manage its skills.</p>
+            <!-- client/script.js updates this with the selected tree description. -->
           </div>
           <div class="button-row">
+            <!-- This holds the edit and delete tree buttons side by side. -->
             <button id="edit-tree-button" class="secondary-button" type="button">
+              <!-- This button opens the edit tree flow in client/script.js. -->
               Edit Tree
             </button>
             <button id="delete-tree-button" class="danger-button" type="button">
+              <!-- This button starts the delete tree flow in client/script.js. -->
               Delete Tree
             </button>
           </div>
         </div>
 
         <div class="detail-grid">
+          <!-- This creates a two-column area for skill creation and summary. -->
           <section class="card inset-card">
+            <!-- This card holds the add skill form. -->
             <h3>Add Skill</h3>
+            <!-- This is the section heading. -->
             <form id="skill-form" class="form">
+              <!-- This form sends new skill data to client/script.js. -->
               <input id="skill-title" type="text" placeholder="Skill title" required />
+              <!-- This input stores the skill title. -->
               <textarea id="skill-description" placeholder="Skill description"></textarea>
+              <!-- This textarea stores the skill description. -->
               <input id="skill-difficulty" type="text" placeholder="Difficulty" />
+              <!-- This input stores the skill difficulty. -->
               <button type="submit">Add Skill</button>
+              <!-- This button submits the skill form. -->
             </form>
           </section>
 
           <section class="card inset-card">
+            <!-- This card shows a small progress summary and legend. -->
             <h3>Progress Summary</h3>
+            <!-- This is the section heading. -->
             <p id="tree-summary-message">No tree selected.</p>
+            <!-- client/script.js updates this summary message after a tree is loaded. -->
             <div id="progress-legend" class="legend">
+              <!-- This legend explains the color meanings for skill statuses. -->
               <span class="legend-chip locked-chip">Locked</span>
+              <!-- This chip means the skill is locked. -->
               <span class="legend-chip available-chip">Available</span>
+              <!-- This chip means the skill is available to start. -->
               <span class="legend-chip in-progress-chip">In Progress</span>
+              <!-- This chip means the skill is currently being worked on. -->
               <span class="legend-chip completed-chip">Completed</span>
+              <!-- This chip means the skill is finished. -->
             </div>
           </section>
         </div>
 
         <section class="card inset-card">
+          <!-- This card shows the simple visual skill map. -->
           <h3>Visual Skill Tree</h3>
+          <!-- This is the section heading. -->
           <div id="skill-map" class="skill-map"></div>
+          <!-- client/script.js fills this div with skill cards for the selected tree. -->
         </section>
 
         <section class="card inset-card">
+          <!-- This card shows the full list of skills and their actions. -->
           <h3>Skills</h3>
+          <!-- This is the section heading. -->
           <ul id="skill-list" class="skill-list"></ul>
+          <!-- client/script.js fills this list with the selected tree's skills. -->
         </section>
       </section>
 
       <p id="status-message" class="status-message"></p>
+      <!-- client/script.js writes success and error messages here. -->
     </main>
 
+    <!-- This loads client/script.js, which adds all the page behavior and API requests. -->
   </body>
 </html>

@@ -1,9 +1,11 @@
-// This imports the database client from client.js.
+// This imports the shared database client from client.js.
+// This file uses that client to send SQL queries to PostgreSQL.
 import db from "./client.js";
 
 // This function gets all progress rows for one user and one tree.
 export async function getProgressByTreeId(userId, treeId) {
-  // This gets progress for every skill in the selected tree.
+  // This runs a query that starts from the skills table.
+  // It then LEFT JOINs the progress table so every skill still appears even if progress has not been saved yet.
   const { rows } = await db.query(
     `SELECT skills.id AS skill_id,
             skills.title,
@@ -18,14 +20,15 @@ export async function getProgressByTreeId(userId, treeId) {
     [userId, treeId]
   );
 
-  // This returns the progress rows.
+  // This returns the progress rows for that tree.
   return rows;
 }
 
 // This function gets one progress row by user and skill.
 export async function getProgressByUserAndSkill(userId, skillId) {
-  // This finds one progress record.
+  // This runs a query that looks for one progress row.
   const {
+    // This takes the first matching row and stores it in a variable called progress.
     rows: [progress],
   } = await db.query(
     `SELECT * FROM user_skill_progress
@@ -33,14 +36,15 @@ export async function getProgressByUserAndSkill(userId, skillId) {
     [userId, skillId]
   );
 
-  // This returns the progress record if it exists.
+  // This returns the matching progress row, or undefined if it was not found.
   return progress;
 }
 
-// This function checks whether all prerequisites are completed.
+// This function checks whether all prerequisites are completed for one skill.
 export async function prerequisitesAreCompleted(userId, skillId) {
-  // This counts prerequisites that are not completed by the user.
+  // This runs a COUNT query that looks for prerequisite skills that are still not completed.
   const {
+    // This takes the first returned row and stores it in a variable called result.
     rows: [result],
   } = await db.query(
     `SELECT COUNT(*)::INTEGER AS count
@@ -53,17 +57,19 @@ export async function prerequisitesAreCompleted(userId, skillId) {
     [userId, skillId]
   );
 
-  // This returns true when nothing is blocking the skill.
+  // This returns true only when the number of unfinished prerequisites is 0.
   return result.count === 0;
 }
 
 // This function creates or updates one progress row.
 export async function upsertProgress(userId, skillId, status) {
-  // This picks a completed date only when the skill is completed.
+  // This stores a completed date only when the status is completed.
   const completedAt = status === "completed" ? new Date() : null;
 
-  // This inserts a new row or updates the existing row.
+  // This runs an INSERT query with ON CONFLICT.
+  // That means it inserts a new row first, but updates the existing row if that user and skill already have progress saved.
   const {
+    // This takes the saved row that PostgreSQL returns and stores it in a variable called progress.
     rows: [progress],
   } = await db.query(
     `INSERT INTO user_skill_progress (user_id, skill_id, status, completed_at)
@@ -76,13 +82,13 @@ export async function upsertProgress(userId, skillId, status) {
     [userId, skillId, status, completedAt]
   );
 
-  // This returns the saved row.
+  // This returns the saved progress row.
   return progress;
 }
 
-// This function creates the user_skill_progress table.
+// This function creates the user_skill_progress table if it does not already exist.
 export async function createUserSkillProgressTable() {
-  // This creates the table if it does not already exist.
+  // This sends a CREATE TABLE query to PostgreSQL.
   await db.query(`
     CREATE TABLE IF NOT EXISTS user_skill_progress (
       id SERIAL PRIMARY KEY,
